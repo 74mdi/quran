@@ -18,14 +18,39 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const currentSurah = getSurahBySlug(surah);
 
   if (!currentSurah) {
-    return {
-      title: "Surah Not Found - Koko Quran",
-    };
+    return { title: "Surah Not Found" };
   }
 
+  const title = `${currentSurah.transliteration} — ${currentSurah.name}`;
+  const description = `Read Surah ${currentSurah.transliteration} (${currentSurah.translation}) — Surah ${currentSurah.id} of 114, ${currentSurah.ayahCount} Ayahs, ${currentSurah.revelationLabel}. Beautiful Arabic text with audio recitation.`;
+  const ogUrl = `/api/og?surah=${currentSurah.id}`;
+  const canonicalPath = `/${currentSurah.slug}`;
+
   return {
-    title: `${currentSurah.transliteration} | Koko Quran`,
-    description: `Read and listen to Surah ${currentSurah.transliteration} (${currentSurah.name}) with ${currentSurah.ayahCount} ayahs.`,
+    title,
+    description,
+    openGraph: {
+      title: `${currentSurah.transliteration} · ${currentSurah.name}`,
+      description,
+      url: canonicalPath,
+      images: [
+        {
+          url: ogUrl,
+          width: 1200,
+          height: 630,
+          alt: `Surah ${currentSurah.transliteration} — Koko Quran`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${currentSurah.transliteration} · ${currentSurah.name}`,
+      description,
+      images: [ogUrl],
+    },
+    alternates: {
+      canonical: canonicalPath,
+    },
   };
 }
 

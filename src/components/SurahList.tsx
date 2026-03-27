@@ -1,10 +1,11 @@
 "use client";
 
-import { Play, Search, X } from "lucide-react";
+import { Download, Play, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePlayerActions } from "@/src/context/PlayerContext";
+import { archiveHusaryMp3Url } from "@/src/lib/archive-mp3";
 import type { SurahMeta } from "@/src/types/quran";
 
 interface SurahListProps {
@@ -18,36 +19,58 @@ interface SurahRowProps {
 
 const SurahRow = memo(({ surah, onPlay }: SurahRowProps) => {
   const rowMeta = `${surah.revelationLabel} · Surah ${surah.id} · ${surah.ayahCount} ayahs`;
+  const archiveHref = archiveHusaryMp3Url(surah.id);
 
   return (
-    <div className="border-border border-t">
+    <div className="group/surah border-border border-t transition-[background-color,box-shadow] duration-300 ease-out hover:bg-gray-a2/85 hover:shadow-[inset_3px_0_0_0_var(--pink-9)]">
       <div className="flex min-h-[72px] items-stretch gap-1 sm:items-center sm:justify-between">
         <button
           type="button"
-          className="mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-base text-muted transition-colors hover:text-pink-9 sm:mt-0"
+          className="mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-base text-muted transition-all duration-300 ease-out group-hover/surah:scale-110 group-hover/surah:bg-pink-a3/25 group-hover/surah:text-pink-9 sm:mt-0"
           aria-label={`Play surah ${surah.transliteration}`}
           onClick={() => {
             onPlay(surah.id);
           }}
         >
-          <Play size={14} />
+          <Play size={14} className="transition-transform duration-300 group-hover/surah:drop-shadow-[0_0_8px_var(--pink-a6)]" />
         </button>
 
-        <Link href={`/${surah.slug}`} className="min-w-0 flex-1 rounded-base py-2 pr-1 transition-colors hover:bg-gray-a2 hover:opacity-100">
+        <Link
+          href={`/${surah.slug}`}
+          className="min-w-0 flex-1 rounded-base py-2 pr-1 transition-all duration-300 ease-out group-hover/surah:translate-x-0.5 group-hover/surah:opacity-100"
+        >
           <div className="flex min-h-[56px] flex-col justify-center gap-1 sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <div className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap">
-              <span lang="ar" className="arabic-inline arabic-name shrink-0 font-arabic-title">
+              <span lang="ar" className="arabic-inline arabic-name shrink-0 font-arabic-title transition-colors duration-300 group-hover/surah:text-pink-11">
                 {surah.name}
               </span>
-              <span className="truncate font-medium">{surah.transliteration}</span>
-              <span className="hidden text-muted sm:inline">·</span>
-              <span className="hidden truncate text-muted sm:inline">{surah.translation}</span>
+              <span className="truncate font-medium transition-colors duration-300 group-hover/surah:text-foreground">{surah.transliteration}</span>
+              <span className="hidden text-muted transition-colors duration-300 group-hover/surah:text-foreground/80 sm:inline">·</span>
+              <span className="hidden truncate text-muted transition-colors duration-300 group-hover/surah:text-foreground/85 sm:inline">
+                {surah.translation}
+              </span>
             </div>
 
-            <p className="hidden shrink-0 whitespace-nowrap text-right text-muted text-small sm:block">{rowMeta}</p>
-            <p className="truncate text-muted text-small sm:hidden">{rowMeta}</p>
+            <p className="hidden shrink-0 whitespace-nowrap text-right text-muted text-small transition-colors duration-300 group-hover/surah:text-foreground/75 sm:block">
+              {rowMeta}
+            </p>
+            <p className="truncate text-muted text-small transition-colors duration-300 group-hover/surah:text-foreground/75 sm:hidden">{rowMeta}</p>
           </div>
         </Link>
+
+        <a
+          href={archiveHref}
+          download
+          rel="noopener noreferrer"
+          title="Download MP3 (Al-Husary, Archive.org)"
+          aria-label={`Download ${surah.transliteration} MP3`}
+          className="mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-base text-muted opacity-80 transition-all duration-300 ease-out hover:bg-gray-a3 group-hover/surah:text-pink-9 group-hover/surah:opacity-100 sm:mt-0"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <Download size={14} className="transition-transform duration-300 group-hover/surah:scale-110" />
+        </a>
       </div>
     </div>
   );

@@ -6,9 +6,10 @@ import { reciters } from "@/src/data/reciters";
 
 interface ReciterSelectProps {
   compact?: boolean;
+  className?: string;
 }
 
-export const ReciterSelect = ({ compact = false }: ReciterSelectProps) => {
+export const ReciterSelect = ({ compact = false, className }: ReciterSelectProps) => {
   const { currentReciterId, setReciter } = usePlayer();
   const currentReciter = reciters.find((reciter) => reciter.id === currentReciterId) ?? reciters[0];
   const currentShortName = currentReciter.name.split(" ")[0] ?? currentReciter.name;
@@ -19,7 +20,9 @@ export const ReciterSelect = ({ compact = false }: ReciterSelectProps) => {
 
   if (compact) {
     return (
-      <label className="relative flex h-11 min-w-[92px] max-w-[160px] cursor-pointer items-center gap-1 rounded-base border border-border px-2 pr-8 text-foreground text-small">
+      <label
+        className={`relative flex h-11 min-w-[92px] max-w-[160px] cursor-pointer items-center gap-1 rounded-base border border-border px-2 pr-8 text-foreground text-small ${className ?? ""}`}
+      >
         <Mic2 size={14} className="shrink-0 text-muted" />
         <span className="reciter-compact-label-full truncate">{currentReciter.name}</span>
         <span className="reciter-compact-label-short truncate">{currentShortName}</span>
