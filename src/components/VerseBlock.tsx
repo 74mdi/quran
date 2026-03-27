@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import { cn } from "@/lib/cn";
 import { toArabicNumber } from "@/src/lib/quran-format";
 import type { QuranVerse } from "@/src/types/quran";
@@ -7,7 +9,7 @@ interface VerseBlockProps {
   isActive?: boolean;
 }
 
-export const VerseBlock = ({ verse, isActive = false }: VerseBlockProps) => {
+const VerseBlockBase = ({ verse, isActive = false }: VerseBlockProps) => {
   return (
     <section
       id={`ayah-${verse.id}`}
@@ -19,3 +21,5 @@ export const VerseBlock = ({ verse, isActive = false }: VerseBlockProps) => {
     </section>
   );
 };
+
+export const VerseBlock = memo(VerseBlockBase);
