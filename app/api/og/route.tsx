@@ -1,24 +1,90 @@
+import { readFile } from "node:fs/promises";
 import { ImageResponse } from "next/og";
-import type { NextRequest } from "next/server";
-import { normalizeSurahSlug, surahMeta } from "@/src/data/quran";
+import { surahTranslations } from "@/src/data/surah-translations";
+import type { SurahMeta } from "@/src/types/quran";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
-export async function GET(req: NextRequest) {
+interface QuranSurahRaw {
+  id: number;
+  name: string;
+  transliteration: string;
+  type: "meccan" | "medinan";
+  total_verses: number;
+}
+
+const translationOverrides: Partial<Record<number, string>> = {
+  1: "The Opening",
+};
+
+const toSlug = (transliteration: string) =>
+  transliteration
+    .replace(/['’`]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const normalizeSurahSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/['’`]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const mapTypeToLabel = (type: "meccan" | "medinan"): "Meccan" | "Medinan" => {
+  return type === "meccan" ? "Meccan" : "Medinan";
+};
+
+const toArrayBuffer = (buffer: Buffer) => {
+  return Uint8Array.from(buffer).buffer;
+};
+
+const interBoldPromise = readFile(new URL("../../../public/assets/inter/semi-bold.ttf", import.meta.url))
+  .then(toArrayBuffer)
+  .catch(() => null);
+
+const getSurahMeta = (() => {
+  let surahMetaPromise: Promise<SurahMeta[]> | null = null;
+
+  return () => {
+    surahMetaPromise ??= readFile(new URL("../../../src/data/quran.json", import.meta.url), "utf8").then((raw) => {
+      const surahs = JSON.parse(raw) as QuranSurahRaw[];
+
+      return surahs.map((surah) => ({
+        id: surah.id,
+        name: surah.name,
+        transliteration: surah.transliteration,
+        translation: translationOverrides[surah.id] ?? surahTranslations[surah.id] ?? surah.transliteration,
+        slug: toSlug(surah.transliteration),
+        revelationLabel: mapTypeToLabel(surah.type),
+        ayahCount: surah.total_verses,
+      }));
+    });
+
+    return surahMetaPromise;
+  };
+})();
+
+const getSurahForQuery = (surahs: SurahMeta[], raw: string) => {
+  return (
+    surahs.find((surah) => String(surah.id) === raw) ||
+    surahs.find((surah) => surah.transliteration.toLowerCase() === raw.toLowerCase()) ||
+    surahs.find(
+      (surah) => normalizeSurahSlug(surah.slug) === normalizeSurahSlug(raw) || normalizeSurahSlug(surah.transliteration) === normalizeSurahSlug(raw),
+    ) ||
+    surahs[0]
+  );
+};
+
+export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const surahParam = searchParams.get("surah");
   const nameParam = searchParams.get("name");
   const raw = surahParam ?? nameParam ?? "1";
+  const [surahMeta, interBold] = await Promise.all([getSurahMeta(), interBoldPromise]);
 
-  const surah =
-    surahMeta.find((s) => String(s.id) === raw) ||
-    surahMeta.find((s) => s.transliteration.toLowerCase() === raw.toLowerCase()) ||
-    surahMeta.find((s) => normalizeSurahSlug(s.slug) === normalizeSurahSlug(raw) || normalizeSurahSlug(s.transliteration) === normalizeSurahSlug(raw)) ||
-    surahMeta[0];
-
-  const interBold = await fetch(new URL("../../../public/assets/inter/semi-bold.ttf", import.meta.url))
-    .then((r) => r.arrayBuffer())
-    .catch(() => null);
+  const surah = getSurahForQuery(surahMeta, raw);
 
   const amiriBold = await fetch("https://fonts.gstatic.com/s/amiri/v30/J7acnpd8CGxBHp2VkZY4.ttf")
     .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error("amiri"))))
