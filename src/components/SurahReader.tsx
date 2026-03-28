@@ -105,11 +105,12 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
           <span>{surah.ayahCount} Ayahs</span>
         </div>
 
-        <div className="mt-2 text-xl leading-tight sm:text-2xl">
-          <span lang="ar" className="arabic-heading arabic-inline font-arabic-title">
+        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 leading-tight sm:gap-4">
+          <span className="min-w-0 truncate text-left text-xl font-medium sm:text-2xl">{surah.transliteration}</span>
+          <span className="px-1 text-center text-muted text-small sm:text-default">{surah.translation}</span>
+          <span lang="ar" className="arabic-heading font-arabic-title justify-self-end text-right text-xl sm:text-2xl">
             {surah.name}
-          </span>{" "}
-          · {surah.transliteration} · {surah.translation}
+          </span>
         </div>
       </div>
 
