@@ -1,23 +1,8 @@
 "use client";
 
-import {
-  Download,
-  ListMusic,
-  Loader2,
-  MoonStar,
-  Pause,
-  Play,
-  Repeat1,
-  Shuffle,
-  SkipBack,
-  SkipForward,
-  Timer,
-  Volume1,
-  Volume2,
-  VolumeX,
-  X,
-} from "lucide-react";
+import { Download, ListMusic, Loader2, MoonStar, Pause, Play, Repeat1, Shuffle, SkipBack, SkipForward, Volume1, Volume2, VolumeX, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ReciterSelect } from "@/src/components/ReciterSelect";
@@ -130,10 +115,8 @@ const Seekbar = memo(({ currentTime, duration, buffered, onSeek }: SeekbarProps)
 Seekbar.displayName = "Seekbar";
 
 function ModeButton({ mode, onToggle, size = 16 }: { mode: PlaybackMode; onToggle: () => void; size?: number }) {
-  const modeIcon =
-    mode === "repeat" ? <Repeat1 size={size} /> : mode === "auto-next" ? <Shuffle size={size} /> : <ListMusic size={size} />;
-  const modeLabel =
-    mode === "repeat" ? "Repeat this surah" : mode === "auto-next" ? "Auto-advance to next surah" : "Play once (in order)";
+  const modeIcon = mode === "repeat" ? <Repeat1 size={size} /> : mode === "auto-next" ? <Shuffle size={size} /> : <ListMusic size={size} />;
+  const modeLabel = mode === "repeat" ? "Repeat this surah" : mode === "auto-next" ? "Auto-advance to next surah" : "Play once (in order)";
   const active = mode !== "normal";
 
   return (
@@ -149,20 +132,18 @@ function ModeButton({ mode, onToggle, size = 16 }: { mode: PlaybackMode; onToggl
   );
 }
 
-function VolumeControl({
-  volume,
-  onVolumeChange,
-  onMuteToggle,
-}: {
-  volume: number;
-  onVolumeChange: (v: number) => void;
-  onMuteToggle: () => void;
-}) {
+function VolumeControl({ volume, onVolumeChange, onMuteToggle }: { volume: number; onVolumeChange: (v: number) => void; onMuteToggle: () => void }) {
   const icon = volume <= 0 ? <VolumeX size={16} /> : volume < 0.5 ? <Volume1 size={16} /> : <Volume2 size={16} />;
 
   return (
     <div className="volume-control">
-      <button type="button" className="player-icon-plain" title={volume <= 0 ? "Unmute" : "Mute"} aria-label={volume <= 0 ? "Unmute" : "Mute"} onClick={onMuteToggle}>
+      <button
+        type="button"
+        className="player-icon-plain"
+        title={volume <= 0 ? "Unmute" : "Mute"}
+        aria-label={volume <= 0 ? "Unmute" : "Mute"}
+        onClick={onMuteToggle}
+      >
         {icon}
       </button>
       <input
@@ -199,6 +180,7 @@ function DownloadArchiveButton({ surah }: { surah: SurahMeta }) {
 }
 
 const BottomPlayerBase = () => {
+  const router = useRouter();
   const {
     isVisible,
     isLoading,
@@ -228,6 +210,7 @@ const BottomPlayerBase = () => {
   } = usePlayer();
 
   const [sleepHint, setSleepHint] = useState<string | null>(null);
+  const pendingNextPageRef = useRef(false);
   const sleepHintTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -237,6 +220,15 @@ const BottomPlayerBase = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!pendingNextPageRef.current || !currentSurah) {
+      return;
+    }
+
+    pendingNextPageRef.current = false;
+    router.push(`/${currentSurah.slug}`);
+  }, [currentSurah, router]);
 
   const showSleepHint = useCallback((minutes: number | null) => {
     setSleepHint(minutes ? `${minutes} min` : "Off");
@@ -266,6 +258,11 @@ const BottomPlayerBase = () => {
     const nextMinutes = cycleSleepTimer();
     showSleepHint(nextMinutes);
   }, [cycleSleepTimer, showSleepHint]);
+
+  const handleNextAndOpenPage = useCallback(async () => {
+    pendingNextPageRef.current = true;
+    await playNextSurah();
+  }, [playNextSurah]);
 
   if (!currentSurah || !isVisible) {
     return null;
@@ -333,7 +330,7 @@ const BottomPlayerBase = () => {
                 className="player-ctrl-btn"
                 aria-label="Next surah"
                 onClick={() => {
-                  void playNextSurah();
+                  void handleNextAndOpenPage();
                 }}
               >
                 <SkipForward size={15} />
@@ -352,7 +349,7 @@ const BottomPlayerBase = () => {
               {sleepHint && <span className="sleep-hint-tooltip player-tooltip player-tooltip-right">{sleepHint}</span>}
               <button
                 type="button"
-                className={`player-sleep-btn${sleepRemainingSeconds ? " player-sleep-active" : ""}${isSleepWarning ? " player-sleep-pulse" : ""}`}
+                className={`player-sleep-btn${sleepRemainingSeconds ? "player-sleep-active" : ""}${isSleepWarning ? "player-sleep-pulse" : ""}`}
                 aria-label="Sleep timer"
                 title="Sleep timer"
                 onClick={handleSleepCycle}
@@ -387,7 +384,7 @@ const BottomPlayerBase = () => {
                 aria-label="Next surah"
                 title="Next surah"
                 onClick={() => {
-                  void playNextSurah();
+                  void handleNextAndOpenPage();
                 }}
               >
                 <SkipForward size={16} />
@@ -396,7 +393,7 @@ const BottomPlayerBase = () => {
                 {sleepHint && <span className="sleep-hint-tooltip player-tooltip player-tooltip-right">{sleepHint}</span>}
                 <button
                   type="button"
-                  className={`player-sleep-btn${sleepRemainingSeconds ? " player-sleep-active" : ""}${isSleepWarning ? " player-sleep-pulse" : ""}`}
+                  className={`player-sleep-btn${sleepRemainingSeconds ? "player-sleep-active" : ""}${isSleepWarning ? "player-sleep-pulse" : ""}`}
                   aria-label="Sleep timer"
                   title="Sleep timer"
                   onClick={handleSleepCycle}

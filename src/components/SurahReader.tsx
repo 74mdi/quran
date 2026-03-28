@@ -106,9 +106,9 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
         </div>
 
         <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 leading-tight sm:gap-4">
-          <span className="min-w-0 truncate text-left text-xl font-medium sm:text-2xl">{surah.transliteration}</span>
+          <span className="min-w-0 truncate text-left font-medium text-xl sm:text-2xl">{surah.transliteration}</span>
           <span className="px-1 text-center text-muted text-small sm:text-default">{surah.translation}</span>
-          <span lang="ar" className="arabic-heading font-arabic-title justify-self-end text-right text-xl sm:text-2xl">
+          <span lang="ar" className="arabic-heading justify-self-end text-right font-arabic-title text-xl sm:text-2xl">
             {surah.name}
           </span>
         </div>
@@ -159,27 +159,39 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
             <span>Highlight</span>
           </button>
 
-          <div className="flex min-h-11 items-center gap-1 rounded-base border border-border px-2">
-            <Hash size={13} className="text-muted" />
-            <span className="text-muted">Jump to Ayah</span>
-            <input
-              type="number"
-              min={1}
-              max={surah.ayahCount}
-              value={jumpToAyah}
-              className="h-8 w-16 bg-transparent text-right outline-none"
-              onChange={(event) => {
-                setJumpToAyah(event.target.value);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  submitJump();
-                }
-              }}
-            />
-            <button type="button" className="h-8 rounded-base px-2 text-muted transition-colors hover:bg-gray-a2 hover:text-foreground" onClick={submitJump}>
-              Go
-            </button>
+          <div className="flex w-full flex-col gap-2 rounded-large border border-border px-3 py-3 sm:min-h-11 sm:w-auto sm:flex-row sm:items-center sm:gap-2 sm:rounded-base sm:px-2 sm:py-0">
+            <div className="flex items-center justify-between gap-2 sm:justify-start">
+              <div className="flex items-center gap-1 text-muted">
+                <Hash size={13} className="text-muted" />
+                <span>Go to Ayah</span>
+              </div>
+              <span className="text-muted text-small sm:hidden">1-{surah.ayahCount}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={1}
+                max={surah.ayahCount}
+                value={jumpToAyah}
+                placeholder="Ayah"
+                className="h-10 min-w-0 flex-1 rounded-base bg-gray-a2 px-3 text-right outline-none transition-colors focus:bg-gray-a3 sm:h-8 sm:w-16 sm:flex-none sm:bg-transparent sm:px-0"
+                onChange={(event) => {
+                  setJumpToAyah(event.target.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    submitJump();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="h-10 rounded-base border border-border px-3 text-muted transition-colors hover:bg-gray-a2 hover:text-foreground sm:h-8 sm:border-0 sm:px-2"
+                onClick={submitJump}
+              >
+                Go
+              </button>
+            </div>
           </div>
         </div>
       </div>
