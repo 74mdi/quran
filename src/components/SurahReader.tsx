@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Download, Hash, Highlighter, Play } from "lucide-react";
+import { Copy, Download, Highlighter, Play } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VerseBlock } from "@/src/components/VerseBlock";
@@ -23,8 +23,6 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
   const { currentAyah, isPlaying } = usePlayerTiming();
 
   const [copied, setCopied] = useState(false);
-  const [jumpToAyah, setJumpToAyah] = useState("");
-
   const lastScrolledAyahRef = useRef<number | null>(null);
   const scrollDebounceRef = useRef<number | null>(null);
 
@@ -83,16 +81,6 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
       setCopied(false);
     }, 1500);
   };
-
-  const submitJump = useCallback(() => {
-    const ayahNumber = Number(jumpToAyah);
-
-    if (!Number.isFinite(ayahNumber) || ayahNumber < 1 || ayahNumber > surah.ayahCount) {
-      return;
-    }
-
-    goToAyah(ayahNumber);
-  }, [goToAyah, jumpToAyah, surah.ayahCount]);
 
   return (
     <div>
@@ -158,41 +146,6 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
             <Highlighter size={14} />
             <span>Highlight</span>
           </button>
-
-          <div className="flex w-full flex-col gap-2 rounded-large border border-border px-3 py-3 sm:min-h-11 sm:w-auto sm:flex-row sm:items-center sm:gap-2 sm:rounded-base sm:px-2 sm:py-0">
-            <div className="flex items-center justify-between gap-2 sm:justify-start">
-              <div className="flex items-center gap-1 text-muted">
-                <Hash size={13} className="text-muted" />
-                <span>Go to Ayah</span>
-              </div>
-              <span className="text-muted text-small sm:hidden">1-{surah.ayahCount}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min={1}
-                max={surah.ayahCount}
-                value={jumpToAyah}
-                placeholder="Ayah"
-                className="h-10 min-w-0 flex-1 rounded-base bg-gray-a2 px-3 text-right outline-none transition-colors focus:bg-gray-a3 sm:h-8 sm:w-16 sm:flex-none sm:bg-transparent sm:px-0"
-                onChange={(event) => {
-                  setJumpToAyah(event.target.value);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    submitJump();
-                  }
-                }}
-              />
-              <button
-                type="button"
-                className="h-10 rounded-base border border-border px-3 text-muted transition-colors hover:bg-gray-a2 hover:text-foreground sm:h-8 sm:border-0 sm:px-2"
-                onClick={submitJump}
-              >
-                Go
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
