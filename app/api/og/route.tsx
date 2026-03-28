@@ -44,6 +44,10 @@ const interBoldPromise = readFile(new URL("../../../public/assets/inter/semi-bol
   .then(toArrayBuffer)
   .catch(() => null);
 
+const notoSansArabicPromise = readFile(new URL("../../../public/assets/noto-sans-arabic.ttf", import.meta.url))
+  .then(toArrayBuffer)
+  .catch(() => null);
+
 const getSurahMeta = (() => {
   let surahMetaPromise: Promise<SurahMeta[]> | null = null;
 
@@ -82,13 +86,9 @@ export async function GET(req: Request) {
   const surahParam = searchParams.get("surah");
   const nameParam = searchParams.get("name");
   const raw = surahParam ?? nameParam ?? "1";
-  const [surahMeta, interBold] = await Promise.all([getSurahMeta(), interBoldPromise]);
+  const [surahMeta, interBold, notoSansArabic] = await Promise.all([getSurahMeta(), interBoldPromise, notoSansArabicPromise]);
 
   const surah = getSurahForQuery(surahMeta, raw);
-
-  const amiriBold = await fetch("https://fonts.gstatic.com/s/amiri/v30/J7acnpd8CGxBHp2VkZY4.ttf")
-    .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error("amiri"))))
-    .catch(() => null);
 
   const fonts: {
     name: string;
@@ -101,8 +101,8 @@ export async function GET(req: Request) {
     fonts.push({ name: "Inter", data: interBold, weight: 700 });
   }
 
-  if (amiriBold) {
-    fonts.push({ name: "Amiri", data: amiriBold, weight: 700 });
+  if (notoSansArabic) {
+    fonts.push({ name: "Noto Sans Arabic", data: notoSansArabic, weight: 400 });
   }
 
   return new ImageResponse(
@@ -165,12 +165,13 @@ export async function GET(req: Request) {
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div
           style={{
+            display: "flex",
             fontSize: "96px",
             color: "rgba(255,255,255,0.9)",
             fontWeight: 700,
             lineHeight: 1,
             letterSpacing: "-0.02em",
-            fontFamily: amiriBold ? "Amiri, serif" : "Inter, sans-serif",
+            fontFamily: notoSansArabic ? '"Noto Sans Arabic", sans-serif' : "Inter, sans-serif",
             direction: "rtl",
           }}
         >
@@ -203,6 +204,7 @@ export async function GET(req: Request) {
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
         <div
           style={{
+            display: "flex",
             fontSize: "13px",
             color: "rgba(255,255,255,0.5)",
             backgroundColor: "rgba(255,255,255,0.07)",
@@ -216,6 +218,7 @@ export async function GET(req: Request) {
         </div>
         <div
           style={{
+            display: "flex",
             fontSize: "13px",
             color: "rgba(255,255,255,0.5)",
             backgroundColor: "rgba(255,255,255,0.07)",
