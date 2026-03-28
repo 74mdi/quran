@@ -2,6 +2,7 @@
 
 import { Copy, Download, Hash, Highlighter, Play, Search } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VerseBlock } from "@/src/components/VerseBlock";
 import { usePlayerActions, usePlayerState, usePlayerTiming } from "@/src/context/PlayerContext";
@@ -18,12 +19,14 @@ interface SurahReaderProps {
 const separator = <span>⋅</span>;
 
 export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
+  const router = useRouter();
   const { playSurah, toggleHighlightAyah } = usePlayerActions();
   const { currentSurahId, highlightAyah } = usePlayerState();
   const { currentAyah, isPlaying } = usePlayerTiming();
 
   const [copied, setCopied] = useState(false);
   const [jumpToAyah, setJumpToAyah] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const lastScrolledAyahRef = useRef<number | null>(null);
   const scrollDebounceRef = useRef<number | null>(null);
@@ -73,9 +76,11 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
 
   const archiveHref = archiveHusaryMp3Url(surah.id);
 
-  const openSearch = useCallback(() => {
-    window.dispatchEvent(new Event("koko-open-search"));
-  }, []);
+  const submitSearch = useCallback(() => {
+    const trimmed = searchQuery.trim();
+
+    router.push(trimmed ? `/?q=${encodeURIComponent(trimmed)}` : "/");
+  }, [router, searchQuery]);
 
   const copyArabicText = async () => {
     const fullArabic = [surah.id === 9 ? null : bismillah, ...surah.verses.map((verse) => verse.text)].filter(Boolean).join("\n\n");
@@ -117,75 +122,98 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-end gap-2 text-small">
-        <button
-          type="button"
-          className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
-          onClick={playCurrentSurah}
-        >
-          <Play size={14} />
-          <span>Play</span>
-        </button>
+      <div className="mt-4 flex flex-col gap-3 text-small">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
+            onClick={playCurrentSurah}
+          >
+            <Play size={14} />
+            <span>Play</span>
+          </button>
 
-        <button type="button" className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2" onClick={openSearch}>
-          <Search size={14} />
-          <span>Search</span>
-        </button>
+          <a
+            href={archiveHref}
+            download
+            rel="noopener noreferrer"
+            title="Download MP3 (Al-Husary, Archive.org)"
+            className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
+          >
+            <Download size={14} />
+            <span className="hidden sm:inline">Download</span>
+          </a>
 
-        <a
-          href={archiveHref}
-          download
-          rel="noopener noreferrer"
-          title="Download MP3 (Al-Husary, Archive.org)"
-          className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
-        >
-          <Download size={14} />
-          <span className="hidden sm:inline">Download</span>
-        </a>
+          <button
+            type="button"
+            className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
+            onClick={() => {
+              void copyArabicText();
+            }}
+          >
+            <Copy size={14} />
+            <span>Copy</span>
+          </button>
 
-        <button
-          type="button"
-          className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
-          onClick={() => {
-            void copyArabicText();
-          }}
-        >
-          <Copy size={14} />
-          <span>Copy</span>
-        </button>
+          <button
+            type="button"
+            className={`inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2 ${
+              highlightAyah ? "text-pink-9" : "text-muted"
+            }`}
+            title={highlightAyah ? "Disable verse highlighting" : "Enable verse highlighting"}
+            onClick={toggleHighlightAyah}
+          >
+            <Highlighter size={14} />
+            <span>Highlight</span>
+          </button>
 
-        <button
-          type="button"
-          className={`inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2 ${
-            highlightAyah ? "text-pink-9" : "text-muted"
-          }`}
-          title={highlightAyah ? "Disable verse highlighting" : "Enable verse highlighting"}
-          onClick={toggleHighlightAyah}
-        >
-          <Highlighter size={14} />
-          <span>Highlight</span>
-        </button>
+          <div className="flex min-h-11 items-center gap-1 rounded-base border border-border px-2">
+            <Hash size={13} className="text-muted" />
+            <span className="text-muted">Jump to Ayah</span>
+            <input
+              type="number"
+              min={1}
+              max={surah.ayahCount}
+              value={jumpToAyah}
+              className="h-8 w-16 bg-transparent text-right outline-none"
+              onChange={(event) => {
+                setJumpToAyah(event.target.value);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  submitJump();
+                }
+              }}
+            />
+            <button type="button" className="h-8 rounded-base px-2 text-muted transition-colors hover:bg-gray-a2 hover:text-foreground" onClick={submitJump}>
+              Go
+            </button>
+          </div>
+        </div>
 
-        <div className="flex min-h-11 items-center gap-1 rounded-base border border-border px-2">
-          <Hash size={13} className="text-muted" />
-          <span className="text-muted">Jump to Ayah</span>
+        <div className="relative">
+          <Search className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" size={14} />
           <input
-            type="number"
-            min={1}
-            max={surah.ayahCount}
-            value={jumpToAyah}
-            className="h-8 w-16 bg-transparent text-right outline-none"
+            type="search"
+            value={searchQuery}
+            placeholder="Search another surah by name, translation, or number"
+            className="h-11 w-full rounded-base border border-border bg-background pr-24 pl-10 outline-none transition-colors placeholder:text-muted focus:border-gray-7"
             onChange={(event) => {
-              setJumpToAyah(event.target.value);
+              setSearchQuery(event.target.value);
             }}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
-                submitJump();
+                event.preventDefault();
+                submitSearch();
               }
             }}
           />
-          <button type="button" className="h-8 rounded-base px-2 text-muted transition-colors hover:bg-gray-a2 hover:text-foreground" onClick={submitJump}>
-            Go
+          <button
+            type="button"
+            className="absolute top-1/2 right-1 flex h-9 min-w-16 -translate-y-1/2 items-center justify-center rounded-base px-3 text-muted transition-colors hover:bg-gray-a2 hover:text-foreground"
+            onClick={submitSearch}
+          >
+            Search
           </button>
         </div>
       </div>

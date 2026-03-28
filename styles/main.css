@@ -385,7 +385,7 @@
 
   @media (width <= 767px) {
     body:has(.bottom-player) main {
-      padding-bottom: 100px;
+      padding-bottom: 156px;
     }
   }
 
@@ -1021,7 +1021,7 @@
   }
 
   body:has(.bottom-player) main {
-    padding-bottom: 72px;
+    padding-bottom: 140px;
   }
 }
 

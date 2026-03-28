@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SurahReader } from "@/src/components/SurahReader";
 import { getAdjacentSurahMeta, getSurahBySlug, surahMeta } from "@/src/data/quran";
+import { getOgImageUrl } from "@/src/lib/og-image";
 
 interface PageProps {
   params: Promise<{ surah: string }>;
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = `${currentSurah.transliteration} — ${currentSurah.name}`;
   const description = `Read Surah ${currentSurah.transliteration} (${currentSurah.translation}) — Surah ${currentSurah.id} of 114, ${currentSurah.ayahCount} Ayahs, ${currentSurah.revelationLabel}. Beautiful Arabic text with audio recitation.`;
-  const ogUrl = `/api/og?surah=${currentSurah.id}`;
+  const ogUrl = getOgImageUrl(currentSurah.id);
   const canonicalPath = `/${currentSurah.slug}`;
 
   return {

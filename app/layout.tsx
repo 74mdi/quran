@@ -10,7 +10,10 @@ import { GlobalSearchShortcut } from "@/src/components/GlobalSearchShortcut";
 import { HomeLink } from "@/src/components/HomeLink";
 import { PageTransition } from "@/src/components/PageTransition";
 import { surahMeta } from "@/src/data/quran";
+import { getOgImageUrl } from "@/src/lib/og-image";
 import { siteUrl } from "@/src/lib/site-url";
+
+const defaultOgImage = getOgImageUrl(1);
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -28,13 +31,13 @@ export const metadata: Metadata = {
     siteName: "Koko Quran",
     title: "Koko Quran — Read the Holy Quran",
     description: "Read the Holy Quran online — all 114 Surahs in beautiful Arabic.",
-    images: [{ url: "/api/og?surah=1", width: 1200, height: 630 }],
+    images: [{ url: defaultOgImage, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Koko Quran — Read the Holy Quran",
     description: "Read the Holy Quran online — all 114 Surahs in beautiful Arabic.",
-    images: ["/api/og?surah=1"],
+    images: [defaultOgImage],
   },
   robots: {
     index: true,

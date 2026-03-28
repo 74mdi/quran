@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SurahList } from "@/src/components/SurahList";
 import { surahMeta } from "@/src/data/quran";
+import { getOgImageUrl } from "@/src/lib/og-image";
 
 export const metadata: Metadata = {
   title: {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   },
   description: "Read the Holy Quran online — all 114 Surahs in beautiful Arabic. Listen to recitation by Mahmoud Khalil Al-Husary.",
   openGraph: {
-    images: [{ url: "/api/og?surah=1", width: 1200, height: 630 }],
+    images: [{ url: getOgImageUrl(1), width: 1200, height: 630 }],
   },
 };
 

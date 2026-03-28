@@ -21,7 +21,7 @@ export const getSiteUrl = () => {
     return withProtocol(vercelHost);
   }
 
-  return "http://localhost:3000";
+  return "https://quranyy.vercel.app";
 };
 
 export const siteUrl = getSiteUrl();
