@@ -1,8 +1,7 @@
 "use client";
 
-import { Copy, Download, Hash, Highlighter, Play, Search } from "lucide-react";
+import { Copy, Download, Hash, Highlighter, Play } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VerseBlock } from "@/src/components/VerseBlock";
 import { usePlayerActions, usePlayerState, usePlayerTiming } from "@/src/context/PlayerContext";
@@ -19,14 +18,12 @@ interface SurahReaderProps {
 const separator = <span>⋅</span>;
 
 export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
-  const router = useRouter();
   const { playSurah, toggleHighlightAyah } = usePlayerActions();
   const { currentSurahId, highlightAyah } = usePlayerState();
   const { currentAyah, isPlaying } = usePlayerTiming();
 
   const [copied, setCopied] = useState(false);
   const [jumpToAyah, setJumpToAyah] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
 
   const lastScrolledAyahRef = useRef<number | null>(null);
   const scrollDebounceRef = useRef<number | null>(null);
@@ -75,12 +72,6 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
   }, [playSurah, surah.id]);
 
   const archiveHref = archiveHusaryMp3Url(surah.id);
-
-  const submitSearch = useCallback(() => {
-    const trimmed = searchQuery.trim();
-
-    router.push(trimmed ? `/?q=${encodeURIComponent(trimmed)}` : "/");
-  }, [router, searchQuery]);
 
   const copyArabicText = async () => {
     const fullArabic = [surah.id === 9 ? null : bismillah, ...surah.verses.map((verse) => verse.text)].filter(Boolean).join("\n\n");
@@ -189,32 +180,6 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
               Go
             </button>
           </div>
-        </div>
-
-        <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" size={14} />
-          <input
-            type="search"
-            value={searchQuery}
-            placeholder="Search another surah by name, translation, or number"
-            className="h-11 w-full rounded-base border border-border bg-background pr-24 pl-10 outline-none transition-colors placeholder:text-muted focus:border-gray-7"
-            onChange={(event) => {
-              setSearchQuery(event.target.value);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                submitSearch();
-              }
-            }}
-          />
-          <button
-            type="button"
-            className="absolute top-1/2 right-1 flex h-9 min-w-16 -translate-y-1/2 items-center justify-center rounded-base px-3 text-muted transition-colors hover:bg-gray-a2 hover:text-foreground"
-            onClick={submitSearch}
-          >
-            Search
-          </button>
         </div>
       </div>
 
