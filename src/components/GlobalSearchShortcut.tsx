@@ -20,6 +20,15 @@ export const GlobalSearchShortcut = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
 
+  const openSearch = () => {
+    if (pathname === "/" || pathname === "/guides") {
+      window.dispatchEvent(new Event("koko-focus-search"));
+      return;
+    }
+
+    setIsOpen(true);
+  };
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -41,19 +50,25 @@ export const GlobalSearchShortcut = () => {
       }
 
       event.preventDefault();
-
-      if (pathname === "/" || pathname === "/guides") {
-        window.dispatchEvent(new Event("koko-focus-search"));
-        return;
-      }
-
-      setIsOpen(true);
+      openSearch();
     };
 
     window.addEventListener("keydown", onKeydown);
 
     return () => {
       window.removeEventListener("keydown", onKeydown);
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    const onOpenSearch = () => {
+      openSearch();
+    };
+
+    window.addEventListener("koko-open-search", onOpenSearch);
+
+    return () => {
+      window.removeEventListener("koko-open-search", onOpenSearch);
     };
   }, [pathname]);
 

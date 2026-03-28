@@ -1,12 +1,10 @@
 "use client";
 
-import { Copy, Download, Hash, Headphones, Highlighter, Play, SkipForward } from "lucide-react";
+import { Copy, Download, Hash, Highlighter, Play, Search } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VerseBlock } from "@/src/components/VerseBlock";
 import { usePlayerActions, usePlayerState, usePlayerTiming } from "@/src/context/PlayerContext";
-import { getSurahById } from "@/src/data/quran";
 import { archiveHusaryMp3Url } from "@/src/lib/archive-mp3";
 import { bismillah } from "@/src/lib/quran-format";
 import type { QuranSurah, SurahMeta } from "@/src/types/quran";
@@ -20,8 +18,7 @@ interface SurahReaderProps {
 const separator = <span>⋅</span>;
 
 export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
-  const router = useRouter();
-  const { playSurah, playNextSurah, toggleHighlightAyah } = usePlayerActions();
+  const { playSurah, toggleHighlightAyah } = usePlayerActions();
   const { currentSurahId, highlightAyah } = usePlayerState();
   const { currentAyah, isPlaying } = usePlayerTiming();
 
@@ -74,34 +71,11 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
     void playSurah(surah.id);
   }, [playSurah, surah.id]);
 
-  const goToPlayingSurahPage = useCallback(() => {
-    if (currentSurahId == null) {
-      return;
-    }
-    const playing = getSurahById(currentSurahId);
-    if (!playing) {
-      return;
-    }
-    if (surah.id === playing.id) {
-      if (currentAyah) {
-        goToAyah(currentAyah);
-      }
-      return;
-    }
-    router.push(`/${playing.slug}`);
-  }, [currentAyah, currentSurahId, goToAyah, router, surah.id]);
-
-  const playNextAndOpenPage = useCallback(async () => {
-    const before = currentSurahId;
-    await playNextSurah();
-    const nextId = before != null ? (before === 114 ? 1 : before + 1) : 1;
-    const meta = getSurahById(nextId);
-    if (meta) {
-      router.push(`/${meta.slug}`);
-    }
-  }, [currentSurahId, playNextSurah, router]);
-
   const archiveHref = archiveHusaryMp3Url(surah.id);
+
+  const openSearch = useCallback(() => {
+    window.dispatchEvent(new Event("koko-open-search"));
+  }, []);
 
   const copyArabicText = async () => {
     const fullArabic = [surah.id === 9 ? null : bismillah, ...surah.verses.map((verse) => verse.text)].filter(Boolean).join("\n\n");
@@ -153,27 +127,9 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
           <span>Play</span>
         </button>
 
-        <button
-          type="button"
-          disabled={currentSurahId == null}
-          title={currentSurahId == null ? "Start playback to open the surah that is playing" : "Open the surah that is currently playing in the player"}
-          className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2 disabled:cursor-not-allowed disabled:opacity-45"
-          onClick={goToPlayingSurahPage}
-        >
-          <Headphones size={14} />
-          <span className="hidden sm:inline">Playing</span>
-        </button>
-
-        <button
-          type="button"
-          title="Play next surah and open its page"
-          className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
-          onClick={() => {
-            void playNextAndOpenPage();
-          }}
-        >
-          <SkipForward size={14} />
-          <span className="hidden sm:inline">Next</span>
+        <button type="button" className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2" onClick={openSearch}>
+          <Search size={14} />
+          <span>Search</span>
         </button>
 
         <a

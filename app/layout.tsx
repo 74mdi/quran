@@ -3,11 +3,11 @@ import "@/styles/main.css";
 import clsx from "clsx";
 import type { Metadata, Viewport } from "next";
 import { Amiri, Inter, Scheherazade_New } from "next/font/google";
-import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
 import { BottomPlayer } from "@/src/components/BottomPlayer";
 import { GlobalSearchShortcut } from "@/src/components/GlobalSearchShortcut";
+import { HomeLink } from "@/src/components/HomeLink";
 import { PageTransition } from "@/src/components/PageTransition";
 import { surahMeta } from "@/src/data/quran";
 import { siteUrl } from "@/src/lib/site-url";
@@ -81,9 +81,7 @@ export default function RootLayout({
           <main className="mx-auto max-w-screen-sm overflow-x-hidden px-6 py-24 md:overflow-x-visible">
             <article className="article">
               <header className="mb-4 flex w-full items-center text-small">
-                <Link href="/" className="text-muted">
-                  Home
-                </Link>
+                <HomeLink />
               </header>
 
               <PageTransition>{children}</PageTransition>

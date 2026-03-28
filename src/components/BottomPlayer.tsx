@@ -4,6 +4,7 @@ import {
   Download,
   ListMusic,
   Loader2,
+  MoonStar,
   Pause,
   Play,
   Repeat1,
@@ -303,10 +304,11 @@ const BottomPlayerBase = () => {
           <div className="player-left">
             <div className="player-surah-number">{currentSurah.id}</div>
             <div className="player-surah-info">
-              <Link href={surahPath} className="player-surah-name">
-                {currentSurah.transliteration}
+              <Link href={surahPath} className="player-surah-title">
+                <span className="player-surah-name">{currentSurah.transliteration}</span>
+                <span className="player-surah-divider">·</span>
+                <span className="player-surah-arabic">{currentSurah.name}</span>
               </Link>
-              <span className="player-surah-arabic">{currentSurah.name}</span>
               <span className="player-reciter-name">{currentReciter.name}</span>
             </div>
           </div>
@@ -355,7 +357,7 @@ const BottomPlayerBase = () => {
                 title="Sleep timer"
                 onClick={handleSleepCycle}
               >
-                <Timer size={16} />
+                <MoonStar size={16} />
                 {sleepBadge && <span className="sleep-badge">{sleepBadge}</span>}
               </button>
             </div>
@@ -370,17 +372,44 @@ const BottomPlayerBase = () => {
 
         <div className="player-mobile">
           <div className="player-mobile-row1">
-            <button type="button" className="player-play-btn-sm" aria-label={isPlaying ? "Pause" : "Play"} onClick={togglePlayback}>
-              {isLoading ? <Loader2 className="animate-spin" size={18} /> : isPlaying ? <Pause size={18} /> : <Play size={18} />}
-            </button>
-            <Link href={surahPath} className="player-mobile-info">
+            <Link href={surahPath} className="player-mobile-info player-surah-title">
               <span className="player-surah-name">{currentSurah.transliteration}</span>
+              <span className="player-surah-divider">·</span>
               <span className="player-surah-arabic">{currentSurah.name}</span>
             </Link>
-            <ModeButton mode={playbackMode} onToggle={cyclePlaybackMode} size={16} />
-            <button type="button" className="player-icon-plain" aria-label="Close player" onClick={closePlayer}>
-              <X size={16} />
-            </button>
+            <div className="player-mobile-actions">
+              <button type="button" className="player-play-btn-sm" aria-label={isPlaying ? "Pause" : "Play"} onClick={togglePlayback}>
+                {isLoading ? <Loader2 className="animate-spin" size={18} /> : isPlaying ? <Pause size={18} /> : <Play size={18} />}
+              </button>
+              <button
+                type="button"
+                className="player-icon-plain"
+                aria-label="Next surah"
+                title="Next surah"
+                onClick={() => {
+                  void playNextSurah();
+                }}
+              >
+                <SkipForward size={16} />
+              </button>
+              <div className="relative">
+                {sleepHint && <span className="sleep-hint-tooltip player-tooltip player-tooltip-right">{sleepHint}</span>}
+                <button
+                  type="button"
+                  className={`player-sleep-btn${sleepRemainingSeconds ? " player-sleep-active" : ""}${isSleepWarning ? " player-sleep-pulse" : ""}`}
+                  aria-label="Sleep timer"
+                  title="Sleep timer"
+                  onClick={handleSleepCycle}
+                >
+                  <MoonStar size={16} />
+                  {sleepBadge && <span className="sleep-badge">{sleepBadge}</span>}
+                </button>
+              </div>
+              <ModeButton mode={playbackMode} onToggle={cyclePlaybackMode} size={16} />
+              <button type="button" className="player-icon-plain" aria-label="Close player" onClick={closePlayer}>
+                <X size={16} />
+              </button>
+            </div>
           </div>
           <div className="player-mobile-row2">
             <span className="player-time">{formatTime(currentTime)}</span>

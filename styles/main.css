@@ -623,9 +623,23 @@
   .player-surah-info {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 3px;
     min-width: 0;
     overflow: hidden;
+  }
+
+  .player-surah-title {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  .player-surah-title:hover {
+    text-decoration: underline;
   }
 
   .player-surah-name {
@@ -635,11 +649,7 @@
     font-weight: 500;
     color: var(--fg);
     white-space: nowrap;
-    text-decoration: none;
-  }
-
-  .player-surah-name:hover {
-    text-decoration: underline;
+    min-width: 0;
   }
 
   .player-surah-arabic {
@@ -647,9 +657,16 @@
     text-overflow: ellipsis;
     font-family: var(--font-amiri), serif;
     font-size: 13px;
-    color: var(--muted);
+    color: color-mix(in srgb, var(--fg) 82%, var(--muted) 18%);
     white-space: nowrap;
     direction: rtl;
+    min-width: 0;
+  }
+
+  .player-surah-divider {
+    flex-shrink: 0;
+    color: var(--muted);
+    opacity: 0.7;
   }
 
   .player-reciter-name {
@@ -969,16 +986,20 @@
 
   .player-mobile-row1 {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
   }
 
   .player-mobile-info {
-    display: flex;
     flex: 1;
-    flex-direction: column;
     min-width: 0;
-    text-decoration: none;
+  }
+
+  .player-mobile-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 2px;
+    align-items: center;
   }
 
   .player-play-btn-sm {
