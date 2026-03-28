@@ -10,9 +10,10 @@ import { BottomPlayer } from "@/src/components/BottomPlayer";
 import { GlobalSearchShortcut } from "@/src/components/GlobalSearchShortcut";
 import { PageTransition } from "@/src/components/PageTransition";
 import { surahMeta } from "@/src/data/quran";
+import { siteUrl } from "@/src/lib/site-url";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://koko-quran.vercel.app"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Koko Quran",
     template: "%s — Koko Quran",
