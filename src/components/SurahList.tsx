@@ -154,7 +154,9 @@ export const SurahList = ({ surahs }: SurahListProps) => {
         <input
           ref={inputRef}
           id="surah-search-input"
-          type="search"
+          type="text"
+          inputMode="search"
+          enterKeyHint="search"
           placeholder="Search surah by name, translation, or number"
           value={query}
           className="h-11 w-full rounded-base border border-border bg-background pr-11 pl-10 outline-none transition-colors placeholder:text-muted focus:border-gray-7"

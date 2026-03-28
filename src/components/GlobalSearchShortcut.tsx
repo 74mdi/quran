@@ -96,7 +96,9 @@ export const GlobalSearchShortcut = () => {
           <Search className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-muted" size={14} />
           <input
             ref={inputRef}
-            type="search"
+            type="text"
+            inputMode="search"
+            enterKeyHint="search"
             value={query}
             placeholder="Search surah and jump to list"
             className="h-11 w-full rounded-base border border-border bg-background pr-11 pl-9 outline-none transition-colors placeholder:text-muted focus:border-gray-7"
