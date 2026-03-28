@@ -2,7 +2,7 @@
 
 import { Search, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const isEditableElement = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) {
@@ -20,14 +20,14 @@ export const GlobalSearchShortcut = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  const openSearch = () => {
+  const openSearch = useCallback(() => {
     if (pathname === "/" || pathname === "/guides") {
       window.dispatchEvent(new Event("koko-focus-search"));
       return;
     }
 
     setIsOpen(true);
-  };
+  }, [pathname]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -58,7 +58,7 @@ export const GlobalSearchShortcut = () => {
     return () => {
       window.removeEventListener("keydown", onKeydown);
     };
-  }, [pathname]);
+  }, [openSearch]);
 
   useEffect(() => {
     const onOpenSearch = () => {
@@ -70,7 +70,7 @@ export const GlobalSearchShortcut = () => {
     return () => {
       window.removeEventListener("koko-open-search", onOpenSearch);
     };
-  }, [pathname]);
+  }, [openSearch]);
 
   const closeModal = () => {
     setIsOpen(false);
