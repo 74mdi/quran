@@ -643,16 +643,17 @@
   }
 
   .player-surah-name {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 13px;
     font-weight: 500;
     color: var(--fg);
     white-space: nowrap;
-    min-width: 0;
   }
 
   .player-surah-arabic {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: var(--font-amiri), serif;
@@ -660,7 +661,6 @@
     color: color-mix(in srgb, var(--fg) 82%, var(--muted) 18%);
     white-space: nowrap;
     direction: rtl;
-    min-width: 0;
   }
 
   .player-surah-divider {
