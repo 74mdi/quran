@@ -14,6 +14,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${siteUrl}/search`,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
     ...surahMeta.map((surah) => ({
       url: `${siteUrl}/${surah.slug}`,
       changeFrequency: "monthly" as const,

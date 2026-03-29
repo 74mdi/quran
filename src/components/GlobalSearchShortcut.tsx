@@ -20,6 +20,11 @@ export const GlobalSearchShortcut = () => {
       return;
     }
 
+    if (pathname === "/search") {
+      window.dispatchEvent(new Event("koko-focus-ayah-search"));
+      return;
+    }
+
     setIsOpen(true);
   }, [pathname]);
 
@@ -57,6 +62,14 @@ export const GlobalSearchShortcut = () => {
   const submitQuery = () => {
     const trimmed = query.trim();
     const path = trimmed ? `/?q=${encodeURIComponent(trimmed)}` : "/";
+
+    router.push(path);
+    closeModal();
+  };
+
+  const goToAyahSearch = () => {
+    const trimmed = query.trim();
+    const path = trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : "/search";
 
     router.push(path);
     closeModal();
@@ -113,6 +126,9 @@ export const GlobalSearchShortcut = () => {
         <div className="mt-3 flex justify-end gap-2">
           <button type="button" className="h-11 rounded-base border border-border px-3 text-small transition-colors hover:bg-gray-a2" onClick={closeModal}>
             Cancel
+          </button>
+          <button type="button" className="h-11 rounded-base border border-border px-3 text-small transition-colors hover:bg-gray-a2" onClick={goToAyahSearch}>
+            Search ayahs
           </button>
           <button type="button" className="h-11 rounded-base border border-border px-3 text-small transition-colors hover:bg-gray-a2" onClick={submitQuery}>
             Search

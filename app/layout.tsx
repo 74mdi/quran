@@ -10,6 +10,7 @@ import { SiteTitle } from "@/components/SiteTitle";
 import { BottomPlayer } from "@/src/components/BottomPlayer";
 import { GlobalSearchShortcut } from "@/src/components/GlobalSearchShortcut";
 import { PageTransition } from "@/src/components/PageTransition";
+import { TextSelectionActions } from "@/src/components/TextSelectionActions";
 import { surahMeta } from "@/src/data/quran";
 import { getOgImageUrl } from "@/src/lib/og-image";
 import { siteUrl } from "@/src/lib/site-url";
@@ -82,6 +83,7 @@ export default function RootLayout({
         <body>
           <Providers surahs={surahMeta}>
             <GlobalSearchShortcut />
+            <TextSelectionActions />
 
             <main id="page-top" className="mx-auto max-w-screen-sm overflow-x-hidden px-6 py-24 md:overflow-x-visible">
               <article className="article">

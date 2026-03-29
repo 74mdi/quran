@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Play, Search, X } from "lucide-react";
+import { ArrowRight, Download, Play, Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -41,10 +41,10 @@ const SurahRow = memo(({ surah, onPlay }: SurahRowProps) => {
         >
           <div className="flex min-h-[56px] flex-col justify-center gap-1 sm:min-h-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <div className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap">
+              <span className="truncate font-medium transition-colors duration-300 group-hover/surah:text-pink-11">{surah.transliteration}</span>
               <span lang="ar" className="arabic-inline arabic-name shrink-0 font-arabic-title transition-colors duration-300 group-hover/surah:text-pink-11">
                 {surah.name}
               </span>
-              <span className="truncate font-medium transition-colors duration-300 group-hover/surah:text-foreground">{surah.transliteration}</span>
               <span className="hidden text-muted transition-colors duration-300 group-hover/surah:text-foreground/80 sm:inline">·</span>
               <span className="hidden truncate text-muted transition-colors duration-300 group-hover/surah:text-foreground/85 sm:inline">
                 {surah.translation}
@@ -177,6 +177,17 @@ export const SurahList = ({ surahs }: SurahListProps) => {
             <X size={14} />
           </button>
         )}
+      </div>
+
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <p className="text-muted text-small">Search surah names here, or open the ayah search page.</p>
+        <Link
+          href="/search"
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-muted text-small transition-colors hover:bg-gray-a2 hover:text-foreground"
+        >
+          <span>Search ayahs</span>
+          <ArrowRight size={13} />
+        </Link>
       </div>
 
       <h2 className="mt-4 py-2 text-muted capitalize">Surahs ({surahs.length})</h2>

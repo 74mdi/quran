@@ -28,6 +28,13 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
   const lastScrolledAyahRef = useRef<number | null>(null);
   const scrollDebounceRef = useRef<number | null>(null);
 
+  const showCopiedToast = useCallback(() => {
+    setCopied(true);
+    window.setTimeout(() => {
+      setCopied(false);
+    }, 1500);
+  }, []);
+
   const goToAyah = useCallback((ayahNumber: number) => {
     const target = document.getElementById(`ayah-${ayahNumber}`);
 
@@ -77,12 +84,8 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
     const fullArabic = [surah.id === 9 ? null : bismillah, ...surah.verses.map((verse) => verse.text)].filter(Boolean).join("\n\n");
 
     await navigator.clipboard.writeText(fullArabic);
-
-    setCopied(true);
-    window.setTimeout(() => {
-      setCopied(false);
-    }, 1500);
-  }, [surah.id, surah.verses]);
+    showCopiedToast();
+  }, [showCopiedToast, surah.id, surah.verses]);
 
   useEffect(() => {
     const onCopySurahText = () => {
