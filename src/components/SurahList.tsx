@@ -1,8 +1,8 @@
 "use client";
 
 import { Download, Play, Search, X } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Link } from "next-view-transitions";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePlayerActions } from "@/src/context/PlayerContext";
 import { archiveHusaryMp3Url } from "@/src/lib/archive-mp3";
@@ -148,7 +148,7 @@ export const SurahList = ({ surahs }: SurahListProps) => {
   );
 
   return (
-    <div className="mt-6 flex flex-col">
+    <div className="mt-2 flex flex-col">
       <div className="relative">
         <Search className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" size={14} />
         <input

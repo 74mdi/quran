@@ -1,8 +1,7 @@
 "use client";
 
 import { Download, ListMusic, Loader2, MoonStar, Pause, Play, Repeat1, Shuffle, SkipBack, SkipForward, Volume1, Volume2, VolumeX, X } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { ReciterSelect } from "@/src/components/ReciterSelect";
@@ -123,8 +122,9 @@ function ModeButton({ mode, onToggle, size = 16 }: { mode: PlaybackMode; onToggl
     <button
       type="button"
       className={active ? "mode-btn-active" : "mode-btn-idle"}
-      title={modeLabel}
+      title={`${modeLabel} (R)`}
       aria-label={`Playback mode: ${modeLabel}`}
+      aria-keyshortcuts="R"
       onClick={onToggle}
     >
       {modeIcon}
@@ -140,8 +140,9 @@ function VolumeControl({ volume, onVolumeChange, onMuteToggle }: { volume: numbe
       <button
         type="button"
         className="player-icon-plain"
-        title={volume <= 0 ? "Unmute" : "Mute"}
+        title={`${volume <= 0 ? "Unmute" : "Mute"} (M)`}
         aria-label={volume <= 0 ? "Unmute" : "Mute"}
+        aria-keyshortcuts="M"
         onClick={onMuteToggle}
       >
         {icon}
@@ -180,7 +181,7 @@ function DownloadArchiveButton({ surah }: { surah: SurahMeta }) {
 }
 
 const BottomPlayerBase = () => {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const {
     isVisible,
     isLoading,
@@ -301,7 +302,7 @@ const BottomPlayerBase = () => {
           <div className="player-left">
             <div className="player-surah-number">{currentSurah.id}</div>
             <div className="player-surah-info">
-              <Link href={surahPath} className="player-surah-title">
+              <Link href={surahPath} className="player-surah-title" title="Open current surah (O)" aria-keyshortcuts="O">
                 <span className="player-surah-name">{currentSurah.transliteration}</span>
                 <span className="player-surah-divider">·</span>
                 <span className="player-surah-arabic">{currentSurah.name}</span>
@@ -316,19 +317,30 @@ const BottomPlayerBase = () => {
                 type="button"
                 className="player-ctrl-btn"
                 aria-label="Previous surah"
+                title="Previous surah (P)"
+                aria-keyshortcuts="P"
                 onClick={() => {
                   void playPreviousSurah();
                 }}
               >
                 <SkipBack size={15} />
               </button>
-              <button type="button" className="player-play-btn" aria-label={isPlaying ? "Pause" : "Play"} onClick={togglePlayback}>
+              <button
+                type="button"
+                className="player-play-btn"
+                aria-label={isPlaying ? "Pause" : "Play"}
+                title={`${isPlaying ? "Pause" : "Play"} (K)`}
+                aria-keyshortcuts="K"
+                onClick={togglePlayback}
+              >
                 {isLoading ? <Loader2 className="animate-spin" size={16} /> : isPlaying ? <Pause size={16} /> : <Play size={16} />}
               </button>
               <button
                 type="button"
                 className="player-ctrl-btn"
                 aria-label="Next surah"
+                title="Next surah (N)"
+                aria-keyshortcuts="N"
                 onClick={() => {
                   void handleNextAndOpenPage();
                 }}
@@ -351,7 +363,8 @@ const BottomPlayerBase = () => {
                 type="button"
                 className={`player-sleep-btn${sleepRemainingSeconds ? "player-sleep-active" : ""}${isSleepWarning ? "player-sleep-pulse" : ""}`}
                 aria-label="Sleep timer"
-                title="Sleep timer"
+                title="Sleep timer (S)"
+                aria-keyshortcuts="S"
                 onClick={handleSleepCycle}
               >
                 <MoonStar size={16} />
@@ -369,20 +382,28 @@ const BottomPlayerBase = () => {
 
         <div className="player-mobile">
           <div className="player-mobile-row1">
-            <Link href={surahPath} className="player-mobile-info player-surah-title">
+            <Link href={surahPath} className="player-mobile-info player-surah-title" title="Open current surah (O)" aria-keyshortcuts="O">
               <span className="player-surah-name">{currentSurah.transliteration}</span>
               <span className="player-surah-divider">·</span>
               <span className="player-surah-arabic">{currentSurah.name}</span>
             </Link>
             <div className="player-mobile-actions">
-              <button type="button" className="player-play-btn-sm" aria-label={isPlaying ? "Pause" : "Play"} onClick={togglePlayback}>
+              <button
+                type="button"
+                className="player-play-btn-sm"
+                aria-label={isPlaying ? "Pause" : "Play"}
+                title={`${isPlaying ? "Pause" : "Play"} (K)`}
+                aria-keyshortcuts="K"
+                onClick={togglePlayback}
+              >
                 {isLoading ? <Loader2 className="animate-spin" size={18} /> : isPlaying ? <Pause size={18} /> : <Play size={18} />}
               </button>
               <button
                 type="button"
                 className="player-icon-plain"
                 aria-label="Next surah"
-                title="Next surah"
+                title="Next surah (N)"
+                aria-keyshortcuts="N"
                 onClick={() => {
                   void handleNextAndOpenPage();
                 }}
@@ -395,7 +416,8 @@ const BottomPlayerBase = () => {
                   type="button"
                   className={`player-sleep-btn${sleepRemainingSeconds ? "player-sleep-active" : ""}${isSleepWarning ? "player-sleep-pulse" : ""}`}
                   aria-label="Sleep timer"
-                  title="Sleep timer"
+                  title="Sleep timer (S)"
+                  aria-keyshortcuts="S"
                   onClick={handleSleepCycle}
                 >
                   <MoonStar size={16} />

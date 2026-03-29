@@ -324,8 +324,62 @@
 
 @layer utilities {
   @media (prefers-reduced-motion: no-preference) {
+    ::view-transition-group(root) {
+      animation: none;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      mix-blend-mode: normal;
+      animation: none;
+    }
+
+    .page-stage {
+      position: relative;
+      view-transition-name: page-content;
+    }
+
+    .bottom-player {
+      view-transition-name: player-bar;
+    }
+
+    .player-toast-wrap {
+      view-transition-name: player-toast;
+    }
+
     .page-enter {
-      animation: page-enter 220ms ease-out forwards;
+      animation: page-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    ::view-transition-group(page-content) {
+      animation-duration: 420ms;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    ::view-transition-old(page-content),
+    ::view-transition-new(page-content) {
+      mix-blend-mode: normal;
+      transform-origin: top center;
+      animation-duration: 420ms;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    ::view-transition-old(page-content) {
+      animation-name: page-old;
+    }
+
+    ::view-transition-new(page-content) {
+      animation-name: page-new;
+    }
+
+    ::view-transition-group(player-bar),
+    ::view-transition-old(player-bar),
+    ::view-transition-new(player-bar),
+    ::view-transition-group(player-toast),
+    ::view-transition-old(player-toast),
+    ::view-transition-new(player-toast) {
+      mix-blend-mode: normal;
+      animation: none;
     }
   }
 
@@ -475,6 +529,10 @@
     background: var(--pink-9);
     border: 1px solid var(--bg);
     border-radius: 999px;
+  }
+
+  .page-stage {
+    position: relative;
   }
 
   .page-enter {
@@ -1028,13 +1086,35 @@
 @keyframes page-enter {
   from {
     opacity: 0;
-    filter: blur(6px);
-    transform: translateY(6px);
+    transform: translateY(12px) scale(0.994);
   }
 
   to {
     opacity: 1;
-    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes page-old {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.994);
+  }
+}
+
+@keyframes page-new {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.992);
+  }
+
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
 }

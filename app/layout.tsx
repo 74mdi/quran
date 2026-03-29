@@ -3,11 +3,12 @@ import "@/styles/main.css";
 import clsx from "clsx";
 import type { Metadata, Viewport } from "next";
 import { Amiri, Inter, Scheherazade_New } from "next/font/google";
+import { ViewTransitions } from "next-view-transitions";
 import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
+import { SiteTitle } from "@/components/SiteTitle";
 import { BottomPlayer } from "@/src/components/BottomPlayer";
 import { GlobalSearchShortcut } from "@/src/components/GlobalSearchShortcut";
-import { HomeLink } from "@/src/components/HomeLink";
 import { PageTransition } from "@/src/components/PageTransition";
 import { surahMeta } from "@/src/data/quran";
 import { getOgImageUrl } from "@/src/lib/og-image";
@@ -76,28 +77,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={clsx(inter.className, amiri.variable, scheherazade.variable)} suppressHydrationWarning>
-      <body>
-        <Providers surahs={surahMeta}>
-          <GlobalSearchShortcut />
+    <ViewTransitions>
+      <html lang="en" className={clsx(inter.className, amiri.variable, scheherazade.variable)} suppressHydrationWarning>
+        <body>
+          <Providers surahs={surahMeta}>
+            <GlobalSearchShortcut />
 
-          <main className="mx-auto max-w-screen-sm overflow-x-hidden px-6 py-24 md:overflow-x-visible">
-            <article className="article">
-              <header className="mb-4 flex w-full items-center text-small">
-                <HomeLink />
-              </header>
+            <main id="page-top" className="mx-auto max-w-screen-sm overflow-x-hidden px-6 py-24 md:overflow-x-visible">
+              <article className="article">
+                <header className="mb-5 flex w-full items-center border-border border-b pb-3">
+                  <SiteTitle className="text-[clamp(2.25rem,9vw,3.4rem)] tracking-[-0.045em]" />
+                </header>
 
-              <PageTransition>{children}</PageTransition>
+                <PageTransition>{children}</PageTransition>
 
-              <div className="mt-16">
-                <Footer />
-              </div>
-            </article>
-          </main>
+                <div className="mt-16">
+                  <Footer />
+                </div>
+              </article>
+            </main>
 
-          <BottomPlayer />
-        </Providers>
-      </body>
-    </html>
+            <BottomPlayer />
+          </Providers>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

@@ -11,8 +11,10 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
   const pathname = usePathname();
 
   return (
-    <div key={pathname} className="page-enter">
-      {children}
+    <div className="page-stage">
+      <div key={pathname} className="page-enter">
+        {children}
+      </div>
     </div>
   );
 };

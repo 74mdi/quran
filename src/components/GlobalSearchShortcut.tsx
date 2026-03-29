@@ -1,19 +1,13 @@
 "use client";
 
 import { Search, X } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-const isEditableElement = (target: EventTarget | null) => {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-
-  return target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable;
-};
+import { keyboardShortcutEvents } from "@/src/lib/keyboard-shortcuts";
 
 export const GlobalSearchShortcut = () => {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const pathname = usePathname();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -44,31 +38,14 @@ export const GlobalSearchShortcut = () => {
   }, [isOpen]);
 
   useEffect(() => {
-    const onKeydown = (event: KeyboardEvent) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey || isEditableElement(event.target)) {
-        return;
-      }
-
-      event.preventDefault();
-      openSearch();
-    };
-
-    window.addEventListener("keydown", onKeydown);
-
-    return () => {
-      window.removeEventListener("keydown", onKeydown);
-    };
-  }, [openSearch]);
-
-  useEffect(() => {
     const onOpenSearch = () => {
       openSearch();
     };
 
-    window.addEventListener("koko-open-search", onOpenSearch);
+    window.addEventListener(keyboardShortcutEvents.openSearch, onOpenSearch);
 
     return () => {
-      window.removeEventListener("koko-open-search", onOpenSearch);
+      window.removeEventListener(keyboardShortcutEvents.openSearch, onOpenSearch);
     };
   }, [openSearch]);
 
@@ -90,7 +67,13 @@ export const GlobalSearchShortcut = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black-a8 px-4 pt-24" role="dialog" aria-modal="true" aria-label="Search Surahs">
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black-a8 px-4 pt-24"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search Surahs"
+      data-koko-search-dialog="true"
+    >
       <div className="w-full max-w-screen-sm rounded-large border border-border bg-background p-4">
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-muted" size={14} />

@@ -1,11 +1,12 @@
 "use client";
 
 import { Copy, Download, Highlighter, Play } from "lucide-react";
-import Link from "next/link";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VerseBlock } from "@/src/components/VerseBlock";
 import { usePlayerActions, usePlayerState, usePlayerTiming } from "@/src/context/PlayerContext";
 import { archiveHusaryMp3Url } from "@/src/lib/archive-mp3";
+import { keyboardShortcutEvents } from "@/src/lib/keyboard-shortcuts";
 import { bismillah } from "@/src/lib/quran-format";
 import type { QuranSurah, SurahMeta } from "@/src/types/quran";
 
@@ -18,6 +19,7 @@ interface SurahReaderProps {
 const separator = <span>⋅</span>;
 
 export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
+  const router = useTransitionRouter();
   const { playSurah, toggleHighlightAyah } = usePlayerActions();
   const { currentSurahId, highlightAyah } = usePlayerState();
   const { currentAyah, isPlaying } = usePlayerTiming();
@@ -71,7 +73,7 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
 
   const archiveHref = archiveHusaryMp3Url(surah.id);
 
-  const copyArabicText = async () => {
+  const copyArabicText = useCallback(async () => {
     const fullArabic = [surah.id === 9 ? null : bismillah, ...surah.verses.map((verse) => verse.text)].filter(Boolean).join("\n\n");
 
     await navigator.clipboard.writeText(fullArabic);
@@ -80,7 +82,47 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
     window.setTimeout(() => {
       setCopied(false);
     }, 1500);
-  };
+  }, [surah.id, surah.verses]);
+
+  useEffect(() => {
+    const onCopySurahText = () => {
+      void copyArabicText();
+    };
+
+    const onToggleHighlight = () => {
+      toggleHighlightAyah();
+    };
+
+    const onPlayCurrentSurah = () => {
+      playCurrentSurah();
+    };
+
+    const onPreviousSurahPage = () => {
+      if (previous) {
+        router.push(`/${previous.slug}`);
+      }
+    };
+
+    const onNextSurahPage = () => {
+      if (next) {
+        router.push(`/${next.slug}`);
+      }
+    };
+
+    window.addEventListener(keyboardShortcutEvents.copySurahText, onCopySurahText);
+    window.addEventListener(keyboardShortcutEvents.toggleHighlight, onToggleHighlight);
+    window.addEventListener(keyboardShortcutEvents.playCurrentSurah, onPlayCurrentSurah);
+    window.addEventListener(keyboardShortcutEvents.goPreviousSurahPage, onPreviousSurahPage);
+    window.addEventListener(keyboardShortcutEvents.goNextSurahPage, onNextSurahPage);
+
+    return () => {
+      window.removeEventListener(keyboardShortcutEvents.copySurahText, onCopySurahText);
+      window.removeEventListener(keyboardShortcutEvents.toggleHighlight, onToggleHighlight);
+      window.removeEventListener(keyboardShortcutEvents.playCurrentSurah, onPlayCurrentSurah);
+      window.removeEventListener(keyboardShortcutEvents.goPreviousSurahPage, onPreviousSurahPage);
+      window.removeEventListener(keyboardShortcutEvents.goNextSurahPage, onNextSurahPage);
+    };
+  }, [copyArabicText, next, playCurrentSurah, previous, router, toggleHighlightAyah]);
 
   return (
     <div>
@@ -107,6 +149,8 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
           <button
             type="button"
             className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
+            title="Play this surah (K)"
+            aria-keyshortcuts="K"
             onClick={playCurrentSurah}
           >
             <Play size={14} />
@@ -127,6 +171,8 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
           <button
             type="button"
             className="inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2"
+            title="Copy Arabic text (C)"
+            aria-keyshortcuts="C"
             onClick={() => {
               void copyArabicText();
             }}
@@ -140,7 +186,8 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
             className={`inline-flex h-11 items-center gap-1.5 rounded-base border border-border px-3 transition-colors hover:bg-gray-a2 ${
               highlightAyah ? "text-pink-9" : "text-muted"
             }`}
-            title={highlightAyah ? "Disable verse highlighting" : "Enable verse highlighting"}
+            title={`${highlightAyah ? "Disable" : "Enable"} verse highlighting (I)`}
+            aria-keyshortcuts="I"
             onClick={toggleHighlightAyah}
           >
             <Highlighter size={14} />
@@ -169,13 +216,13 @@ export const SurahReader = ({ surah, previous, next }: SurahReaderProps) => {
 
       <div className="mt-16 flex w-full justify-between border-border border-t pt-8">
         {previous && (
-          <Link href={`/${previous.slug}`} className="flex w-full flex-col gap-1 text-left">
+          <Link href={`/${previous.slug}`} className="flex w-full flex-col gap-1 text-left" title="Previous surah ([)" aria-keyshortcuts="[">
             <span className="text-muted">Previous</span>
             <span>{previous.transliteration}</span>
           </Link>
         )}
         {next && (
-          <Link href={`/${next.slug}`} className="flex w-full flex-col gap-1 text-right">
+          <Link href={`/${next.slug}`} className="flex w-full flex-col gap-1 text-right" title="Next surah (])" aria-keyshortcuts="]">
             <span className="text-muted">Next</span>
             <span>{next.transliteration}</span>
           </Link>
